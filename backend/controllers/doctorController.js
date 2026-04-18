@@ -2,6 +2,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
+import slotModel from "../models/slotModel.js";
 
 // API for doctor Login 
 const loginDoctor = async (req, res) => {
@@ -54,7 +55,15 @@ const appointmentCancel = async (req, res) => {
 
         const appointmentData = await appointmentModel.findById(appointmentId)
         if (appointmentData && appointmentData.docId === docId) {
+
             await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+
+            const { slotDate, slotTime } = appointmentData
+            await slotModel.findOneAndUpdate(
+                { doctorId: docId, date: slotDate, time: slotTime },
+                { $set: { isBooked: false, bookedBy: null } }
+            )
+
             return res.json({ success: true, message: 'Appointment Cancelled' })
         }
 
@@ -100,6 +109,25 @@ const doctorList = async (req, res) => {
         res.json({ success: false, message: error.message })
     }
 
+}
+
+// API to get slots for a doctor and date
+const doctorSlots = async (req, res) => {
+    try {
+
+        const { doctorId, date } = req.query
+
+        if (!doctorId || !date) {
+            return res.json({ success: false, message: 'Missing doctorId or date' })
+        }
+
+        const slots = await slotModel.find({ doctorId, date }).sort({ time: 1 })
+        res.json({ success: true, slots })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
 }
 
 // API to change doctor availablity for Admin and Doctor Panel
@@ -199,5 +227,6 @@ export {
     appointmentComplete,
     doctorDashboard,
     doctorProfile,
-    updateDoctorProfile
+    updateDoctorProfile,
+    doctorSlots
 }

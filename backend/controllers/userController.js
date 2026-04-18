@@ -4,6 +4,7 @@ import validator from "validator";
 import userModel from "../models/userModel.js";
 import doctorModel from "../models/doctorModel.js";
 import appointmentModel from "../models/appointmentModel.js";
+import slotModel from "../models/slotModel.js";
 import { v2 as cloudinary } from 'cloudinary'
 import stripe from "stripe";
 import razorpay from 'razorpay';
@@ -138,28 +139,30 @@ const bookAppointment = async (req, res) => {
         const { userId, docId, slotDate, slotTime } = req.body
         const docData = await doctorModel.findById(docId).select("-password")
 
-        if (!docData.available) {
+        if (!docData || !docData.available) {
             return res.json({ success: false, message: 'Doctor Not Available' })
-        }
-
-        let slots_booked = docData.slots_booked
-
-        // checking for slot availablity 
-        if (slots_booked[slotDate]) {
-            if (slots_booked[slotDate].includes(slotTime)) {
-                return res.json({ success: false, message: 'Slot Not Available' })
-            }
-            else {
-                slots_booked[slotDate].push(slotTime)
-            }
-        } else {
-            slots_booked[slotDate] = []
-            slots_booked[slotDate].push(slotTime)
         }
 
         const userData = await userModel.findById(userId).select("-password")
 
-        delete docData.slots_booked
+        // ensure slot document exists (or create), then atomically mark as booked
+        // 1) upsert slot skeleton if missing
+        try {
+            await slotModel.create({ doctorId: docId, date: slotDate, time: slotTime });
+        } catch (e) {
+            // ignore duplicate key error, means slot already exists
+        }
+
+        // 2) atomically book if not already booked
+        const bookedSlot = await slotModel.findOneAndUpdate(
+            { doctorId: docId, date: slotDate, time: slotTime, isBooked: { $ne: true } },
+            { $set: { isBooked: true, bookedBy: userId } },
+            { new: true }
+        );
+
+        if (!bookedSlot) {
+            return res.json({ success: false, message: 'Slot Not Available' })
+        }
 
         const appointmentData = {
             userId,
@@ -174,9 +177,6 @@ const bookAppointment = async (req, res) => {
 
         const newAppointment = new appointmentModel(appointmentData)
         await newAppointment.save()
-
-        // save new slots data in docData
-        await doctorModel.findByIdAndUpdate(docId, { slots_booked })
 
         res.json({ success: true, message: 'Appointment Booked' })
 
@@ -201,16 +201,13 @@ const cancelAppointment = async (req, res) => {
 
         await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
 
-        // releasing doctor slot 
+        // releasing slot: mark as not booked
         const { docId, slotDate, slotTime } = appointmentData
 
-        const doctorData = await doctorModel.findById(docId)
-
-        let slots_booked = doctorData.slots_booked
-
-        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
-
-        await doctorModel.findByIdAndUpdate(docId, { slots_booked })
+        await slotModel.findOneAndUpdate(
+            { doctorId: docId, date: slotDate, time: slotTime },
+            { $set: { isBooked: false, bookedBy: null } }
+        )
 
         res.json({ success: true, message: 'Appointment Cancelled' })
 

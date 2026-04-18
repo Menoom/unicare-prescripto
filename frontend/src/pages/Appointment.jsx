@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from 'react'
+import { useContext, useEffect, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../context/AppContext'
 import { assets } from '../assets/assets'
@@ -30,6 +30,7 @@ const Appointment = () => {
 
         // getting current date
         let today = new Date()
+        const allDaysSlots = []
 
         for (let i = 0; i < 7; i++) {
 
@@ -53,35 +54,47 @@ const Appointment = () => {
 
             let timeSlots = [];
 
-
+            // pre-generate times for the day
+            const generated = []
             while (currentDate < endTime) {
-                let formattedTime = currentDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-                let day = currentDate.getDate()
-                let month = currentDate.getMonth() + 1
-                let year = currentDate.getFullYear()
-
-                const slotDate = day + "_" + month + "_" + year
-                const slotTime = formattedTime
-
-                const isSlotAvailable = docInfo.slots_booked[slotDate] && docInfo.slots_booked[slotDate].includes(slotTime) ? false : true
-
-                if (isSlotAvailable) {
-
-                    // Add slot to array
-                    timeSlots.push({
-                        datetime: new Date(currentDate),
-                        time: formattedTime
-                    })
-                }
-
-                // Increment current time by 30 minutes
+                generated.push(new Date(currentDate))
                 currentDate.setMinutes(currentDate.getMinutes() + 30);
             }
 
-            setDocSlots(prev => ([...prev, timeSlots]))
+            // fetch existing slots for this day from backend
+            let day = generated[0].getDate()
+            let month = generated[0].getMonth() + 1
+            let year = generated[0].getFullYear()
+            const slotDate = day + "_" + month + "_" + year
 
+            let existingSlots = []
+            try {
+                const { data } = await axios.get(backendUrl + `/api/doctor/slots`, {
+                    params: { doctorId: docId, date: slotDate }
+                })
+                if (data.success) {
+                    existingSlots = data.slots
+                }
+            } catch (error) {
+                console.log(error)
+            }
+
+            generated.forEach(dt => {
+                const formattedTime = dt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
+
+                const matched = existingSlots.find(s => s.time === formattedTime)
+
+                timeSlots.push({
+                    datetime: dt,
+                    time: formattedTime,
+                    isBooked: matched ? matched.isBooked : false
+                })
+            })
+
+            allDaysSlots.push(timeSlots)
         }
+
+        setDocSlots(allDaysSlots)
 
     }
 
@@ -173,7 +186,18 @@ const Appointment = () => {
 
                 <div className='flex items-center gap-3 w-full overflow-x-scroll mt-4'>
                     {docSlots.length && docSlots[slotIndex].map((item, index) => (
-                        <p onClick={() => setSlotTime(item.time)} key={index} className={`text-sm font-light  flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.time === slotTime ? 'bg-primary text-white' : 'text-[#949494] border border-[#B4B4B4]'}`}>{item.time.toLowerCase()}</p>
+                        <p
+                            onClick={() => !item.isBooked && setSlotTime(item.time)}
+                            key={index}
+                            className={`text-sm font-light flex-shrink-0 px-5 py-2 rounded-full cursor-pointer ${item.isBooked
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : item.time === slotTime
+                                    ? 'bg-primary text-white'
+                                    : 'text-[#949494] border border-[#B4B4B4]'
+                                }`}
+                        >
+                            {item.time.toLowerCase()}
+                        </p>
                     ))}
                 </div>
 
