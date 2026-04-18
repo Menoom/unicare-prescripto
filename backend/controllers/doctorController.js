@@ -189,6 +189,56 @@ const doctorDashboard = async (req, res) => {
         res.json({ success: false, message: error.message })
     }
 }
+// API for Doctor Self Registration
+const registerDoctor = async (req, res) => {
+    try {
+        const { name, email, phone, password, speciality, degree, experience, licenseNo, aadhar, city, address, hospitalName } = req.body
+
+        // Check if doctor already exists
+        const exists = await doctorModel.findOne({ email })
+        if (exists) {
+            return res.json({ success: false, message: "Doctor already registered with this email" })
+        }
+
+        // Validate required fields
+        if (!name || !email || !password || !speciality || !degree) {
+            return res.json({ success: false, message: "Please fill all required fields" })
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+
+        const doctorData = {
+            name,
+            email,
+            password: hashedPassword,
+            image: "https://res.cloudinary.com/demo/image/upload/v1/default_doctor.png",
+            speciality,
+            degree,
+            experience: experience || "0 Years",
+            about: `Dr. ${name} - ${speciality}`,
+            available: false,
+            fees: 0,
+            address: { line1: address || "", line2: city || "" },
+            date: Date.now(),
+            phone: phone || "",
+            licenseNo: licenseNo || "",
+            aadhar: aadhar || "",
+            hospitalName: hospitalName || "",
+            isApproved: false
+        }
+
+        const newDoctor = new doctorModel(doctorData)
+        await newDoctor.save()
+
+        res.json({ success: true, message: "Registration successful! Wait for admin approval." })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
 
 export {
     loginDoctor,
@@ -199,5 +249,6 @@ export {
     appointmentComplete,
     doctorDashboard,
     doctorProfile,
-    updateDoctorProfile
+    updateDoctorProfile,
+    registerDoctor   
 }

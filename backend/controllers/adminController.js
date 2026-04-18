@@ -12,6 +12,10 @@ const loginAdmin = async (req, res) => {
 
         const { email, password } = req.body
 
+        // DEBUG: log incoming and expected admin credentials
+        console.log('loginAdmin - received:', { email, password })
+        console.log('loginAdmin - env:', { ADMIN_EMAIL: process.env.ADMIN_EMAIL, ADMIN_PASSWORD: process.env.ADMIN_PASSWORD })
+
         if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
             const token = jwt.sign(email + password, process.env.JWT_SECRET)
             res.json({ success: true, token })
