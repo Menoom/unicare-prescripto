@@ -1,6 +1,7 @@
 import jwt from "jsonwebtoken";
 import appointmentModel from "../models/appointmentModel.js";
 import doctorModel from "../models/doctorModel.js";
+import slotModel from "../models/slotModel.js";
 import bcrypt from "bcrypt";
 import validator from "validator";
 import { v2 as cloudinary } from "cloudinary";
@@ -50,7 +51,15 @@ const appointmentCancel = async (req, res) => {
     try {
 
         const { appointmentId } = req.body
-        await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+        const appointmentData = await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+
+        if (appointmentData) {
+            const { docId, slotDate, slotTime } = appointmentData
+            await slotModel.findOneAndUpdate(
+                { doctorId: docId, date: slotDate, time: slotTime },
+                { $set: { isBooked: false, bookedBy: null } }
+            )
+        }
 
         res.json({ success: true, message: 'Appointment Cancelled' })
 

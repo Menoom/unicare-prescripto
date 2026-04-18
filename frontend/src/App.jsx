@@ -10,12 +10,20 @@ import Appointment from './pages/Appointment'
 import MyAppointments from './pages/MyAppointments'
 import MyProfile from './pages/MyProfile'
 import Footer from './components/Footer'
+import Chatbot from './components/Chatbot'
+import { useContext } from 'react'
+import { AppContext } from './context/AppContext'
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Verify from './pages/Verify'
 import DoctorAuth from './pages/DoctorAuth'
 
 const App = () => {
+  const { backendUrl } = useContext(AppContext);
+  // Optionally, handle chatbot UI actions here
+  const handleChatbotAction = (data) => {
+    // Example: if (data.intent === 'booking') ...
+  };
   return (
     <div className='mx-4 sm:mx-[10%]'>
       <ToastContainer />
@@ -34,6 +42,7 @@ const App = () => {
         <Route path='/doctor-auth' element={<DoctorAuth />} />
       </Routes>
       <Footer />
+      <Chatbot backendUrl={backendUrl} onAction={handleChatbotAction} />
     </div>
   )
 }

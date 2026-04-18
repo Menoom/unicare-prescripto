@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "mongoose": "^9.2.3"
+    "mongoose": "^9.2.3",
+    "@google/generative-ai": "^0.24.1"
   }
 }
