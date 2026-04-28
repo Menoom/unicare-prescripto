@@ -3,83 +3,54 @@ import { assets } from '../assets/assets'
 
 const Header = () => {
     return (
-        <div className='relative w-full overflow-hidden rounded-2xl' style={{minHeight: '560px'}}>
-
-            {/* Background - Doctor image as full background */}
-            <div className='absolute inset-0 w-full h-full'>
-                <img
-                    src={assets.header_img}
-                    alt=""
-                    className='w-full h-full object-cover object-top'
-                    style={{filter: 'brightness(0.45)'}}
-                />
-            </div>
-
-            {/* Gradient overlay - left side darker for text readability */}
-            <div className='absolute inset-0' style={{
-                background: 'linear-gradient(90deg, rgba(10,30,80,0.85) 0%, rgba(10,30,80,0.6) 50%, rgba(10,30,80,0.2) 100%)'
-            }}></div>
-
-            {/* Subtle teal/blue color tint overlay */}
-            <div className='absolute inset-0' style={{
-                background: 'linear-gradient(135deg, rgba(79,70,229,0.3) 0%, rgba(59,130,246,0.1) 100%)'
-            }}></div>
-
-            {/* Content */}
-            <div className='relative z-10 flex flex-col items-start justify-center h-full px-8 md:px-16 lg:px-24 py-20' style={{minHeight: '560px'}}>
-
-                {/* Badge */}
-                <div className='flex items-center gap-2 px-4 py-1.5 rounded-full mb-6' style={{background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)', backdropFilter: 'blur(10px)'}}>
-                    <div className='w-2 h-2 bg-green-400 rounded-full'></div>
-                    <span className='text-white text-xs font-medium'>100+ Trusted Doctors Available</span>
-                </div>
-
-                {/* Heading */}
-                <h1 className='text-4xl md:text-5xl lg:text-6xl text-white font-bold leading-tight max-w-xl mb-4'>
-                    Compassionate Care, <br />
-                    <span style={{color: '#93c5fd'}}>Exceptional Results</span>
+        <div className='flex flex-col-reverse md:flex-row items-center gap-10 py-16 md:py-24'>
+            {/* Left Content */}
+            <div className='flex-1'>
+                <p className='text-sm font-semibold text-primary tracking-wide uppercase mb-4'>Trusted Healthcare Platform</p>
+                <h1 className='text-4xl md:text-5xl font-extrabold text-navy leading-[1.15] tracking-tight'>
+                    Book Appointments<br />
+                    with Trusted Doctors
                 </h1>
-
-                {/* Subtext */}
-                <p className='text-gray-200 text-sm md:text-base leading-relaxed max-w-md mb-3'>
-                    <span className='font-semibold text-white'>UniCare</span> connects you with trusted doctors for hassle-free appointment booking and quality healthcare.
+                <p className='text-gray-500 text-[15px] leading-relaxed mt-5 max-w-lg'>
+                    UniCare connects you with verified healthcare professionals. Schedule appointments, manage your health records, and get quality care — all in one place.
                 </p>
 
-                {/* Profiles + Count */}
-                <div className='flex items-center gap-3 mb-8'>
-                    <img className='w-12' src={assets.group_profiles} alt="" />
-                    <div>
-                        <p className='text-white text-sm font-semibold'>10,000+ Patients</p>
-                        <p className='text-gray-300 text-xs'>Trust UniCare every month</p>
-                    </div>
+                <div className='flex items-center gap-3 mt-6'>
+                    <img className='w-20' src={assets.group_profiles} alt="" />
+                    <p className='text-gray-500 text-sm'>Trusted by <strong className='text-navy'>10,000+</strong> patients</p>
                 </div>
 
-                {/* Buttons */}
-                <div className='flex items-center gap-4 mb-10'>
-                    <a href='#speciality' className='flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-full text-sm font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300'>
+                <div className='flex items-center gap-3 mt-8'>
+                    <a href='#speciality' className='bg-primary text-white px-7 py-3 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors inline-flex items-center gap-2'>
                         Book Appointment
-                        <img className='w-3' src={assets.arrow_icon} alt="" style={{filter: 'brightness(0) invert(1)'}} />
+                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 8l4 4m0 0l-4 4m4-4H3' /></svg>
                     </a>
-                    <a href='#speciality' className='text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-white hover:text-primary transition-all duration-300' style={{border: '1.5px solid rgba(255,255,255,0.6)'}}>
+                    <a href='#speciality' className='px-7 py-3 rounded-lg text-sm font-medium text-gray-600 border border-gray-200 hover:border-gray-300 hover:text-navy transition-colors'>
                         Find Doctors
                     </a>
                 </div>
+            </div>
 
-                {/* Stats Row */}
-                <div className='flex gap-8 pt-6 border-t w-full max-w-sm' style={{borderColor: 'rgba(255,255,255,0.2)'}}>
-                    <div>
-                        <p className='text-white font-bold text-2xl'>100+</p>
-                        <p className='text-gray-300 text-xs mt-0.5'>Doctors</p>
+            {/* Right Image */}
+            <div className='flex-1 relative'>
+                <div className='rounded-2xl overflow-hidden'>
+                    <img src={assets.header_img} alt="" className='w-full h-auto object-cover rounded-2xl' />
+                </div>
+                {/* Stats overlay */}
+                <div className='absolute bottom-4 left-4 right-4 bg-white/90 backdrop-blur-sm rounded-xl p-4 border border-gray-100 shadow-medium hidden md:flex items-center justify-between'>
+                    <div className='text-center px-4'>
+                        <p className='text-xl font-bold text-navy'>100+</p>
+                        <p className='text-xs text-gray-400 mt-0.5'>Doctors</p>
                     </div>
-                    <div className='w-px' style={{background: 'rgba(255,255,255,0.2)'}}></div>
-                    <div>
-                        <p className='text-white font-bold text-2xl'>95%</p>
-                        <p className='text-gray-300 text-xs mt-0.5'>Satisfaction</p>
+                    <div className='w-px h-8 bg-gray-200'></div>
+                    <div className='text-center px-4'>
+                        <p className='text-xl font-bold text-navy'>95%</p>
+                        <p className='text-xs text-gray-400 mt-0.5'>Satisfaction</p>
                     </div>
-                    <div className='w-px' style={{background: 'rgba(255,255,255,0.2)'}}></div>
-                    <div>
-                        <p className='text-white font-bold text-2xl'>10k+</p>
-                        <p className='text-gray-300 text-xs mt-0.5'>Patients</p>
+                    <div className='w-px h-8 bg-gray-200'></div>
+                    <div className='text-center px-4'>
+                        <p className='text-xl font-bold text-navy'>10k+</p>
+                        <p className='text-xs text-gray-400 mt-0.5'>Patients</p>
                     </div>
                 </div>
             </div>

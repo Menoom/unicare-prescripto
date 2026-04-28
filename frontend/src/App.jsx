@@ -20,28 +20,27 @@ import DoctorAuth from './pages/DoctorAuth'
 
 const App = () => {
   const { backendUrl } = useContext(AppContext);
-  // Optionally, handle chatbot UI actions here
-  const handleChatbotAction = (data) => {
-    // Example: if (data.intent === 'booking') ...
-  };
+  const handleChatbotAction = (data) => { };
   return (
-    <div className='mx-4 sm:mx-[10%]'>
-      <ToastContainer />
-      <Navbar />
-      <Routes>
-        <Route path='/' element={<Home />} />
-        <Route path='/doctors' element={<Doctors />} />
-        <Route path='/doctors/:speciality' element={<Doctors />} />
-        <Route path='/login' element={<Login />} />
-        <Route path='/about' element={<About />} />
-        <Route path='/contact' element={<Contact />} />
-        <Route path='/appointment/:docId' element={<Appointment />} />
-        <Route path='/my-appointments' element={<MyAppointments />} />
-        <Route path='/my-profile' element={<MyProfile />} />
-        <Route path='/verify' element={<Verify />} />
-        <Route path='/doctor-auth' element={<DoctorAuth />} />
-      </Routes>
-      <Footer />
+    <div className='min-h-screen bg-white'>
+      <ToastContainer position="top-center" autoClose={3000} />
+      <div className='max-w-[1280px] mx-auto px-5 sm:px-8'>
+        <Navbar />
+        <Routes>
+          <Route path='/' element={<Home />} />
+          <Route path='/doctors' element={<Doctors />} />
+          <Route path='/doctors/:speciality' element={<Doctors />} />
+          <Route path='/login' element={<Login />} />
+          <Route path='/about' element={<About />} />
+          <Route path='/contact' element={<Contact />} />
+          <Route path='/appointment/:docId' element={<Appointment />} />
+          <Route path='/my-appointments' element={<MyAppointments />} />
+          <Route path='/my-profile' element={<MyProfile />} />
+          <Route path='/verify' element={<Verify />} />
+          <Route path='/doctor-auth' element={<DoctorAuth />} />
+        </Routes>
+        <Footer />
+      </div>
       <Chatbot backendUrl={backendUrl} onAction={handleChatbotAction} />
     </div>
   )

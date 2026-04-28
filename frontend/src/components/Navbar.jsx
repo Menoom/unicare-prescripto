@@ -14,75 +14,72 @@ const Navbar = () => {
     navigate('/login')
   }
 
-  return (
-    <div className='flex items-center justify-between text-sm py-4 mb-5 border-b border-b-[#ADADAD]'>
+  const links = [
+    { to: '/', label: 'Home' },
+    { to: '/doctors', label: 'All Doctors' },
+    { to: '/about', label: 'About' },
+    { to: '/doctor-auth', label: 'Doctor Login' },
+    { to: '/contact', label: 'Contact' },
+  ]
 
-      {/* Logo + UniCare Name */}
+  return (
+    <nav className='flex items-center justify-between py-5 border-b border-gray-100'>
+      {/* Logo */}
       <div onClick={() => navigate('/')} className='flex items-center gap-2 cursor-pointer'>
-        <img className='w-10' src={assets.logo} alt="" />
-        <span className='text-primary font-bold text-xl hidden sm:block'>UniCare</span>
+        <img className='w-9' src={assets.logo} alt="" />
+        <span className='text-navy font-semibold text-lg tracking-tight hidden sm:block'>UniCare</span>
       </div>
 
       {/* Desktop Nav */}
-      <ul className='md:flex items-start gap-5 font-medium hidden'>
-        <NavLink to='/'>
-          <li className='py-1'>HOME</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/doctors'>
-          <li className='py-1'>ALL DOCTORS</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/about'>
-          <li className='py-1'>ABOUT</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/doctor-auth'>
-          <li className='py-1'>DOCTOR LOGIN</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
-        <NavLink to='/contact'>
-          <li className='py-1'>CONTACT</li>
-          <hr className='border-none outline-none h-0.5 bg-primary w-3/5 m-auto hidden' />
-        </NavLink>
+      <ul className='md:flex items-center gap-6 hidden'>
+        {links.map(({ to, label }) => (
+          <NavLink key={to} to={to}>
+            <li className='text-[13px] font-medium text-gray-500 hover:text-navy transition-colors py-1'>{label}</li>
+            <hr className='border-none h-[2px] bg-primary w-4/5 m-auto hidden rounded' />
+          </NavLink>
+        ))}
       </ul>
 
-      <div className='flex items-center gap-4'>
+      {/* Right */}
+      <div className='flex items-center gap-3'>
         {token && userData
           ? <div className='flex items-center gap-2 cursor-pointer group relative'>
-              <img className='w-8 rounded-full' src={userData.image} alt="" />
-              <img className='w-2.5' src={assets.dropdown_icon} alt="" />
-              <div className='absolute top-0 right-0 pt-14 text-base font-medium text-gray-600 z-20 hidden group-hover:block'>
-                <div className='min-w-48 bg-gray-50 rounded flex flex-col gap-4 p-4'>
-                  <p onClick={() => navigate('/my-profile')} className='hover:text-black cursor-pointer'>My Profile</p>
-                  <p onClick={() => navigate('/my-appointments')} className='hover:text-black cursor-pointer'>My Appointments</p>
-                  <p onClick={logout} className='hover:text-black cursor-pointer'>Logout</p>
-                </div>
+            <img className='w-8 h-8 rounded-full object-cover border-2 border-gray-100' src={userData.image} alt="" />
+            <img className='w-2.5 opacity-50' src={assets.dropdown_icon} alt="" />
+            <div className='absolute top-0 right-0 pt-12 text-sm font-medium text-gray-600 z-20 hidden group-hover:block'>
+              <div className='w-48 bg-white rounded-lg border border-gray-100 shadow-elevated py-2'>
+                <p onClick={() => navigate('/my-profile')} className='px-4 py-2 hover:bg-gray-50 hover:text-navy cursor-pointer transition-colors'>My Profile</p>
+                <p onClick={() => navigate('/my-appointments')} className='px-4 py-2 hover:bg-gray-50 hover:text-navy cursor-pointer transition-colors'>My Appointments</p>
+                <hr className='my-1 border-gray-100' />
+                <p onClick={logout} className='px-4 py-2 hover:bg-red-50 hover:text-red-600 cursor-pointer transition-colors'>Logout</p>
               </div>
             </div>
-          : <button onClick={() => navigate('/login')} className='bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block'>Create account</button>
+          </div>
+          : <button onClick={() => navigate('/login')} className='bg-primary text-white px-6 py-2 rounded-lg text-sm font-medium hover:bg-primary-hover transition-colors hidden md:block'>
+            Get Started
+          </button>
         }
-        <img onClick={() => setShowMenu(true)} className='w-6 md:hidden' src={assets.menu_icon} alt="" />
+        <img onClick={() => setShowMenu(true)} className='w-6 md:hidden cursor-pointer' src={assets.menu_icon} alt="" />
 
         {/* Mobile Menu */}
-        <div className={`md:hidden ${showMenu ? 'fixed w-full' : 'h-0 w-0'} right-0 top-0 bottom-0 z-20 overflow-hidden bg-white transition-all`}>
-          <div className='flex items-center justify-between px-5 py-6'>
-            <div className='flex items-center gap-2'>
-              <img src={assets.logo} className='w-8' alt="" />
-              <span className='text-primary font-bold text-lg'>UniCare</span>
+        <div className={`md:hidden fixed inset-0 z-50 ${showMenu ? '' : 'pointer-events-none'}`}>
+          <div className={`absolute inset-0 bg-black/20 transition-opacity duration-200 ${showMenu ? 'opacity-100' : 'opacity-0'}`} onClick={() => setShowMenu(false)} />
+          <div className={`absolute right-0 top-0 bottom-0 w-64 bg-white border-l border-gray-100 transition-transform duration-200 ${showMenu ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className='flex items-center justify-between px-5 py-5 border-b border-gray-100'>
+              <span className='text-navy font-semibold text-base'>UniCare</span>
+              <img onClick={() => setShowMenu(false)} src={assets.cross_icon} className='w-5 cursor-pointer opacity-60 hover:opacity-100' alt="" />
             </div>
-            <img onClick={() => setShowMenu(false)} src={assets.cross_icon} className='w-7' alt="" />
+            <ul className='flex flex-col py-3'>
+              {links.map(({ to, label }) => (
+                <NavLink key={to} onClick={() => setShowMenu(false)} to={to}>
+                  <p className='px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-navy transition-colors'>{label}</p>
+                </NavLink>
+              ))}
+            </ul>
           </div>
-          <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium'>
-            <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded-full inline-block'>HOME</p></NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to='/doctors'><p className='px-4 py-2 rounded-full inline-block'>ALL DOCTORS</p></NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to='/about'><p className='px-4 py-2 rounded-full inline-block'>ABOUT</p></NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to='/contact'><p className='px-4 py-2 rounded-full inline-block'>CONTACT</p></NavLink>
-            <NavLink onClick={() => setShowMenu(false)} to='/doctor-auth'><p className='px-4 py-2 rounded-full inline-block'>DOCTOR LOGIN</p></NavLink>
-          </ul>
         </div>
       </div>
-    </div>
+    </nav>
   )
 }
 
