@@ -58,12 +58,13 @@ const Header = () => {
                 <div className='flex items-center gap-4 mb-8'>
                     <a href='#speciality' className='flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-full text-sm font-semibold hover:shadow-xl hover:scale-105 transition-all duration-300'>
                         Book Appointment
-                        <img className='w-3' src={assets.arrow_icon} alt="" style={{filter: 'brightness(0) invert(1)'}} />
+                        <svg className='w-4 h-4' fill='none' stroke='currentColor' viewBox='0 0 24 24'><path strokeLinecap='round' strokeLinejoin='round' strokeWidth={2} d='M17 8l4 4m0 0l-4 4m4-4H3' /></svg>
                     </a>
-                    <a href='#speciality' className='text-white px-8 py-3 rounded-full text-sm font-semibold hover:bg-white hover:text-primary transition-all duration-300' style={{border: '1.5px solid rgba(255,255,255,0.6)'}}>
+                    <a href='#speciality' className='px-7 py-3 rounded-lg text-sm font-medium text-gray-600 border border-gray-200 hover:border-gray-300 hover:text-navy transition-colors'>
                         Find Doctors
                     </a>
                 </div>
+            </div>
 
                 {/* Stats */}
                 <div className='flex gap-10 pt-5 border-t' style={{borderColor: 'rgba(255,255,255,0.2)'}}>

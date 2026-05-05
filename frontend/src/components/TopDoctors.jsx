@@ -7,47 +7,42 @@ const TopDoctors = () => {
     const { doctors } = useContext(AppContext)
 
     return (
-        <div className='py-16 px-4 md:px-10 bg-gray-50 rounded-2xl mx-4 md:mx-0'>
-
-            {/* Section Header */}
-            <div className='flex flex-col items-center gap-3 mb-10'>
-                <span className='text-xs font-semibold text-primary bg-blue-50 border border-blue-100 px-4 py-1.5 rounded-full uppercase tracking-widest'>Our Doctors</span>
-                <h1 className='text-3xl font-bold text-gray-800'>Top Doctors to Book</h1>
-                <p className='sm:w-1/3 text-center text-sm text-gray-500 leading-relaxed'>
-                    Meet our top-rated doctors at <strong className='text-primary'>UniCare</strong> and book your appointment today.
+        <div className='py-16'>
+            <div className='text-center mb-10'>
+                <h2 className='text-2xl font-bold text-navy'>Top Doctors to Book</h2>
+                <p className='text-gray-400 text-sm mt-2 max-w-md mx-auto'>
+                    Meet our highly rated doctors and book with confidence.
                 </p>
             </div>
 
-            {/* Doctors Grid */}
-            <div className='w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-5'>
+            <div className='w-full grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4'>
                 {doctors.slice(0, 10).map((item, index) => (
                     <div
                         onClick={() => { navigate(`/appointment/${item._id}`); scrollTo(0, 0) }}
                         key={index}
-                        className='bg-white border border-blue-50 rounded-2xl overflow-hidden cursor-pointer hover:-translate-y-2 hover:shadow-lg transition-all duration-300 group'
+                        className='bg-white border border-gray-100 rounded-xl overflow-hidden cursor-pointer hover:-translate-y-1 hover:shadow-medium transition-all duration-200'
                     >
-                        <div className='bg-blue-50 flex items-center justify-center overflow-hidden'>
-                            <img className='w-full h-48 object-cover group-hover:scale-105 transition-all duration-300' src={item.image} alt="" />
+                        <div className='bg-gray-50'>
+                            <img className='w-full h-44 object-cover' src={item.image} alt="" />
                         </div>
-                        <div className='p-4'>
-                            <div className={`flex items-center gap-1.5 text-xs mb-2 ${item.available ? 'text-green-500' : 'text-gray-400'}`}>
-                                <div className={`w-1.5 h-1.5 rounded-full ${item.available ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`}></div>
-                                <span>{item.available ? 'Available' : 'Not Available'}</span>
+                        <div className='p-3.5'>
+                            <div className={`flex items-center gap-1.5 text-xs mb-1.5 ${item.available ? 'text-green-600' : 'text-gray-400'}`}>
+                                <span className={`w-1.5 h-1.5 rounded-full ${item.available ? 'bg-green-500' : 'bg-gray-300'}`}></span>
+                                {item.available ? 'Available' : 'Not Available'}
                             </div>
-                            <p className='text-gray-800 font-semibold text-sm'>{item.name}</p>
-                            <p className='text-primary text-xs mt-0.5'>{item.speciality}</p>
+                            <p className='text-navy font-semibold text-sm'>{item.name}</p>
+                            <p className='text-gray-400 text-xs mt-0.5'>{item.speciality}</p>
                         </div>
                     </div>
                 ))}
             </div>
 
-            {/* More Button */}
-            <div className='flex justify-center mt-10'>
+            <div className='text-center mt-10'>
                 <button
                     onClick={() => { navigate('/doctors'); scrollTo(0, 0) }}
-                    className='flex items-center gap-2 bg-white border border-primary text-primary px-10 py-3 rounded-full text-sm font-semibold hover:bg-primary hover:text-white transition-all duration-300'
+                    className='px-10 py-2.5 rounded-lg text-sm font-medium text-gray-600 border border-gray-200 hover:border-primary hover:text-primary transition-colors'
                 >
-                    View All Doctors →
+                    View All Doctors
                 </button>
             </div>
         </div>

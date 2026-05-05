@@ -1,30 +1,63 @@
 import doctorModel from "../models/doctorModel.js";
 import slotModel from "../models/slotModel.js";
+import appointmentModel from "../models/appointmentModel.js";
 
+// Keep this list intentionally small (5-6 main categories) and map many keywords into them.
+// The frontend can guide the user via buttons, and free-text still works via keyword matching.
 const symptomToSpeciality = {
+    // General Physician
     fever: "General physician",
     cough: "General physician",
     cold: "General physician",
     flu: "General physician",
+    sore: "General physician",
+    throat: "General physician",
+    bodyache: "General physician",
+    fatigue: "General physician",
+    headache: "General physician",
+
+    // Gastro
+    stomach: "Gastroenterologist",
+    abdomen: "Gastroenterologist",
+    nausea: "Gastroenterologist",
+    vomiting: "Gastroenterologist",
+    diarrhea: "Gastroenterologist",
+    constipation: "Gastroenterologist",
+    acidity: "Gastroenterologist",
+    indigestion: "Gastroenterologist",
+
+    // Skin
     skin: "Dermatologist",
     rash: "Dermatologist",
     acne: "Dermatologist",
-    headache: "Neurologist",
+    itching: "Dermatologist",
+    allergy: "Dermatologist",
+
+    // Neuro
     migraine: "Neurologist",
-    child: "Pediatrician",
-    baby: "Pediatrician",
-    pregnancy: "Gynecologist",
-    period: "Gynecologist",
-    stomach: "Gastroenterologist",
-    digestion: "Gastroenterologist",
+    dizziness: "Neurologist",
+    fainting: "Neurologist",
+
+    // Cardio / chest
     heart: "Cardiologist",
     "chest pain": "Cardiologist",
+    palpitation: "Cardiologist",
+    breath: "Cardiologist",
+
+    // Ortho
     bone: "Orthopedic",
     joint: "Orthopedic",
-    eye: "Ophthalmologist",
+    back: "Orthopedic",
+    knee: "Orthopedic",
+
+    // Women / child / ENT / eye (still supported via aliases below)
+    pregnancy: "Gynecologist",
+    period: "Gynecologist",
+    child: "Pediatrician",
+    baby: "Pediatrician",
     ear: "ENT",
     nose: "ENT",
-    throat: "ENT"
+    eye: "Ophthalmologist"
 };
 
 const specialityAliases = {
@@ -99,6 +132,10 @@ const detectIntent = (message) => {
         return "urgency";
     }
 
+    if (lowerMessage.includes("view my appointments") || lowerMessage.includes("my appointments") || lowerMessage.includes("appointments")) {
+        return "view_appointments";
+    }
+
     if (lowerMessage.includes("book") || lowerMessage.includes("slot") || lowerMessage.includes("availability")) {
         return "booking";
     }
@@ -131,9 +168,34 @@ const findDoctorsBySpeciality = async (speciality) => {
     });
 };
 
+const toDoctorCards = (doctors = []) => doctors.map((doc) => ({
+    _id: doc._id,
+    name: doc.name,
+    image: doc.image,
+    designation: doc.speciality,
+    experience: doc.experience
+}));
+
+const toAppointmentCards = (appointments = []) => appointments.map((apt) => ({
+    _id: apt._id,
+    slotDate: apt.slotDate,
+    slotTime: apt.slotTime,
+    cancelled: apt.cancelled,
+    payment: apt.payment,
+    isCompleted: apt.isCompleted,
+    doctor: {
+        _id: apt.docData?._id || apt.docId,
+        name: apt.docData?.name,
+        image: apt.docData?.image,
+        designation: apt.docData?.speciality,
+        experience: apt.docData?.experience
+    }
+}));
+
 export const chatHandler = async (req, res) => {
     try {
         const message = req.body?.message?.trim();
+        const userId = req.body?.userId; // optional (used for viewing appointments)
 
         if (!message) {
             return res.status(400).json({
@@ -149,12 +211,26 @@ export const chatHandler = async (req, res) => {
 
         let response_text = "";
         let doctors = [];
+        let doctor_cards = [];
+        let appointments = [];
+        let appointment_cards = [];
         let slots = [];
 
         if (intent === "urgency") {
             response_text = "This may be urgent. Please visit the nearest hospital or contact emergency services immediately.";
+        } else if (intent === "view_appointments") {
+            if (!userId) {
+                response_text = "Please login to view your appointments.";
+            } else {
+                appointments = await appointmentModel.find({ userId }).sort({ date: -1 });
+                appointment_cards = toAppointmentCards(appointments);
+                response_text = appointments.length
+                    ? `Here are your recent appointments (${appointments.length}).`
+                    : "You don't have any appointments yet.";
+            }
         } else if (intent === "booking") {
             doctors = await findDoctorsBySpeciality(speciality);
+            doctor_cards = toDoctorCards(doctors);
 
             if (!speciality) {
                 response_text = "Tell me the speciality or symptom, and I can help you find the right doctor.";
@@ -166,6 +242,7 @@ export const chatHandler = async (req, res) => {
             }
         } else if (intent === "symptom_check") {
             doctors = await findDoctorsBySpeciality(speciality);
+            doctor_cards = toDoctorCards(doctors);
 
             if (speciality && doctors.length) {
                 response_text = `Based on what you described, you can consult a ${speciality}. I found ${doctors.length} matching doctor${doctors.length > 1 ? "s" : ""}.`;
@@ -185,7 +262,10 @@ export const chatHandler = async (req, res) => {
             date,
             urgency_level,
             response_text: addSafetySuffix(response_text),
-            doctors,
+            doctors, // legacy
+            doctor_cards,
+            appointments, // legacy
+            appointment_cards,
             slots
         });
     } catch (error) {

@@ -20,10 +20,7 @@ import DoctorAuth from './pages/DoctorAuth'
 
 const App = () => {
   const { backendUrl } = useContext(AppContext);
-  // Optionally, handle chatbot UI actions here
-  const handleChatbotAction = (data) => {
-    // Example: if (data.intent === 'booking') ...
-  };
+  const handleChatbotAction = (data) => { };
   return (
     <div className='mx-4 sm:mx-[1%]'>
       <ToastContainer />
