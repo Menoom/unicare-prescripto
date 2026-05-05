@@ -12,7 +12,6 @@ const Footer = () => {
         {/* Brand */}
         <div>
           <div className='flex items-center gap-2 mb-5 cursor-pointer' onClick={() => navigate('/')}>
-            <img className='w-8' src={assets.logo} alt="" />
             <span className='text-primary font-bold text-xl'>UniCare</span>
           </div>
           <p className='w-full md:w-2/3 text-gray-600 leading-6'>

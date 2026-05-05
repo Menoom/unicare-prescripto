@@ -49,7 +49,6 @@ function LoginPage({ onRegister }) {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center px-4">
       <div className="bg-white rounded-2xl shadow-lg p-8 w-full max-w-md">
-
         <div className="text-center mb-8">
           <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-white text-3xl mx-auto mb-4 shadow-md">
             🩺
@@ -64,10 +63,7 @@ function LoginPage({ onRegister }) {
 
         {error && <p className="text-red-500 text-sm mb-3">⚠ {error}</p>}
 
-        <button
-          onClick={handleLogin}
-          className="w-full bg-primary text-white py-3 rounded-full font-medium text-sm hover:bg-primary/90 transition-all mt-2"
-        >
+        <button onClick={handleLogin} className="w-full bg-primary text-white py-3 rounded-full font-medium text-sm hover:bg-primary/90 transition-all mt-2">
           Login →
         </button>
 
@@ -77,10 +73,7 @@ function LoginPage({ onRegister }) {
           <div className="flex-1 h-px bg-gray-200" />
         </div>
 
-        <button
-          onClick={onRegister}
-          className="w-full border border-primary text-primary py-3 rounded-full font-medium text-sm hover:bg-blue-50 transition-all"
-        >
+        <button onClick={onRegister} className="w-full border border-primary text-primary py-3 rounded-full font-medium text-sm hover:bg-blue-50 transition-all">
           + Self Registration
         </button>
       </div>
@@ -92,14 +85,14 @@ function LoginPage({ onRegister }) {
 function RegistrationPage({ onBack, onSuccess }) {
   const [form, setForm] = useState({
     fullName: "", email: "", phone: "", dob: "",
-    gender: "", address: "", city: "",
+    gender: "", city: "",
     specialization: "", qualification: "", experience: "",
     medRegNo: "", licenseNo: "",
-    aadhar: "", panCard: "",
+    aadhar: "", fees: "", about: "",
     hospitalName: "",
     password: "", confirmPassword: "",
   });
-  const [files, setFiles] = useState({ license: "", certificate: "", aadharDoc: "", photo: "" });
+  const [files, setFiles] = useState({ license: "", photo: "" });
   const [error, setError] = useState("");
 
   const setField = (key) => (e) => setForm({ ...form, [key]: e.target.value });
@@ -123,7 +116,7 @@ function RegistrationPage({ onBack, onSuccess }) {
       return;
     }
     try {
-    const response = await axios.post('http://localhost:4000/api/doctor/register', {
+      const response = await axios.post('http://localhost:4000/api/doctor/register', {
         name: form.fullName,
         email: form.email,
         phone: form.phone,
@@ -134,17 +127,18 @@ function RegistrationPage({ onBack, onSuccess }) {
         licenseNo: form.licenseNo,
         aadhar: form.aadhar,
         city: form.city,
-        address: form.address,
-        hospitalName: form.hospitalName
-    })
-    if (response.data.success) {
+        hospitalName: form.hospitalName,
+        fees: form.fees,
+        about: form.about,
+      })
+      if (response.data.success) {
         onSuccess(form.fullName)
-    } else {
+      } else {
         setError(response.data.message)
+      }
+    } catch (err) {
+      setError("Server error. Please try again.")
     }
-} catch (err) {
-    setError("Server error. Please try again.")
-}
   };
 
   return (
@@ -165,7 +159,7 @@ function RegistrationPage({ onBack, onSuccess }) {
         <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3 mt-4 border-b border-blue-100 pb-2">Personal Information</p>
         <div className="grid grid-cols-2 gap-4">
           <InputField label="Full Name" required placeholder="Dr. Priya Sharma" value={form.fullName} onChange={setField("fullName")} />
-          <InputField label="Date of Birth" required type="date" value={form.dob} onChange={setField("dob")} />
+          <InputField label="Date of Birth" type="date" value={form.dob} onChange={setField("dob")} />
         </div>
         <div className="grid grid-cols-2 gap-4">
           <InputField label="Email Address" required type="email" placeholder="doctor@email.com" value={form.email} onChange={setField("email")} />
@@ -173,7 +167,7 @@ function RegistrationPage({ onBack, onSuccess }) {
         </div>
         <div className="grid grid-cols-2 gap-4">
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-600 mb-1">Gender <span className="text-red-500">*</span></label>
+            <label className="block text-sm font-medium text-gray-600 mb-1">Gender</label>
             <select className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-primary" value={form.gender} onChange={setField("gender")}>
               <option value="">Select</option>
               <option>Male</option>
@@ -183,7 +177,6 @@ function RegistrationPage({ onBack, onSuccess }) {
           </div>
           <InputField label="City" placeholder="Mumbai" value={form.city} onChange={setField("city")} />
         </div>
-        <InputField label="Full Address" placeholder="123, Street Name, Colony..." value={form.address} onChange={setField("address")} />
 
         {/* Medical Credentials */}
         <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3 mt-4 border-b border-blue-100 pb-2">Medical Credentials</p>
@@ -215,23 +208,28 @@ function RegistrationPage({ onBack, onSuccess }) {
           <InputField label="Experience (Years)" type="number" placeholder="5" value={form.experience} onChange={setField("experience")} />
           <InputField label="Hospital / Clinic Name" placeholder="City Hospital" value={form.hospitalName} onChange={setField("hospitalName")} />
         </div>
-
-        {/* Identity */}
-        <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3 mt-4 border-b border-blue-100 pb-2">Identity Documents</p>
         <div className="grid grid-cols-2 gap-4">
+          <InputField label="Consultation Fees (₹)" type="number" placeholder="500" value={form.fees} onChange={setField("fees")} />
           <InputField label="Aadhar Number" required placeholder="XXXX XXXX XXXX" value={form.aadhar} onChange={setField("aadhar")} />
-          <InputField label="PAN Card Number" placeholder="ABCDE1234F" value={form.panCard} onChange={setField("panCard")} />
         </div>
 
-        {/* File Uploads */}
+        {/* About */}
+        <div className="mb-4">
+          <label className="block text-sm font-medium text-gray-600 mb-1">About Doctor</label>
+          <textarea
+            placeholder="Write a brief description about yourself, your expertise and experience..."
+            value={form.about}
+            onChange={setField("about")}
+            rows={3}
+            className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm text-gray-700 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all resize-none"
+          />
+        </div>
+
+        {/* Document Uploads */}
         <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3 mt-4 border-b border-blue-100 pb-2">Document Uploads</p>
         <div className="grid grid-cols-2 gap-4">
           <FileField label="Medical License" required fileName={files.license} onChange={setFile("license")} />
-          <FileField label="Degree Certificate" required fileName={files.certificate} onChange={setFile("certificate")} />
-        </div>
-        <div className="grid grid-cols-2 gap-4">
-          <FileField label="Aadhar Card" required fileName={files.aadharDoc} onChange={setFile("aadharDoc")} />
-          <FileField label="Doctor Photo" fileName={files.photo} onChange={setFile("photo")} />
+          <FileField label="Doctor Photo" required fileName={files.photo} onChange={setFile("photo")} />
         </div>
 
         {/* Password */}
@@ -243,10 +241,7 @@ function RegistrationPage({ onBack, onSuccess }) {
 
         {error && <p className="text-red-500 text-sm mb-3">⚠ {error}</p>}
 
-        <button
-          onClick={handleSubmit}
-          className="w-full bg-primary text-white py-3 rounded-full font-medium text-sm hover:bg-primary/90 transition-all mt-2"
-        >
+        <button onClick={handleSubmit} className="w-full bg-primary text-white py-3 rounded-full font-medium text-sm hover:bg-primary/90 transition-all mt-2">
           Submit Registration →
         </button>
       </div>
@@ -265,10 +260,7 @@ function SuccessPage({ name, onBack }) {
           <span className="text-primary font-semibold">Dr. {name}</span>, your registration has been submitted successfully.<br /><br />
           You will receive a confirmation email once your credentials are verified. Verification may take 24–48 hours.
         </p>
-        <button
-          onClick={onBack}
-          className="w-full bg-primary text-white py-3 rounded-full font-medium text-sm hover:bg-primary/90 transition-all"
-        >
+        <button onClick={onBack} className="w-full bg-primary text-white py-3 rounded-full font-medium text-sm hover:bg-primary/90 transition-all">
           Go to Login
         </button>
       </div>

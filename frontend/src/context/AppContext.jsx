@@ -13,43 +13,57 @@ const AppContextProvider = (props) => {
     const [token, setToken] = useState(localStorage.getItem('token') ? localStorage.getItem('token') : '')
     const [userData, setUserData] = useState(false)
 
+    // Dark Mode State
+    const [darkMode, setDarkMode] = useState(() => {
+        return localStorage.getItem('darkMode') === 'true' ? true : false
+    })
+
+    // Toggle Dark Mode
+    const toggleDarkMode = () => {
+        setDarkMode(prev => {
+            const newMode = !prev
+            localStorage.setItem('darkMode', newMode)
+            return newMode
+        })
+    }
+
+    // Apply dark mode class to html element
+    useEffect(() => {
+        if (darkMode) {
+            document.documentElement.classList.add('dark')
+        } else {
+            document.documentElement.classList.remove('dark')
+        }
+    }, [darkMode])
+
     // Getting Doctors using API
     const getDoctosData = async () => {
-
         try {
-
             const { data } = await axios.get(backendUrl + '/api/doctor/list')
             if (data.success) {
                 setDoctors(data.doctors)
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
             console.log(error)
             toast.error(error.message)
         }
-
     }
 
     // Getting User Profile using API
     const loadUserProfileData = async () => {
-
         try {
-
             const { data } = await axios.get(backendUrl + '/api/user/get-profile', { headers: { token } })
-
             if (data.success) {
                 setUserData(data.userData)
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
             console.log(error)
             toast.error(error.message)
         }
-
     }
 
     useEffect(() => {
@@ -67,7 +81,8 @@ const AppContextProvider = (props) => {
         currencySymbol,
         backendUrl,
         token, setToken,
-        userData, setUserData, loadUserProfileData
+        userData, setUserData, loadUserProfileData,
+        darkMode, toggleDarkMode
     }
 
     return (
@@ -75,7 +90,6 @@ const AppContextProvider = (props) => {
             {props.children}
         </AppContext.Provider>
     )
-
 }
 
 export default AppContextProvider

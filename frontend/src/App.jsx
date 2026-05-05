@@ -25,7 +25,7 @@ const App = () => {
     // Example: if (data.intent === 'booking') ...
   };
   return (
-    <div className='mx-4 sm:mx-[10%]'>
+    <div className='mx-4 sm:mx-[1%]'>
       <ToastContainer />
       <Navbar />
       <Routes>
