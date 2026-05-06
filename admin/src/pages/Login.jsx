@@ -1,11 +1,13 @@
 import axios from 'axios'
-import { useContext, useState } from 'react'
+import React, { useContext, useState, useEffect } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { DoctorContext } from '../context/DoctorContext'
 import { AdminContext } from '../context/AdminContext'
 import { toast } from 'react-toastify'
 
 const Login = () => {
 
+  const navigate = useNavigate()
   const [state, setState] = useState('Admin')
 
   const [email, setEmail] = useState('')
@@ -13,15 +15,14 @@ const Login = () => {
 
   const backendUrl = import.meta.env.VITE_BACKEND_URL
 
-  const { setDToken } = useContext(DoctorContext)
-  const { setAToken } = useContext(AdminContext)
+  const { dToken, setDToken } = useContext(DoctorContext)
+  const { aToken, setAToken } = useContext(AdminContext)
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
     try {
       if (state === 'Admin') {
-
         const { data } = await axios.post(backendUrl + '/api/admin/login', { email, password })
         if (data.success) {
           setAToken(data.token)
@@ -29,9 +30,7 @@ const Login = () => {
         } else {
           toast.error(data.message)
         }
-
       } else {
-
         const { data } = await axios.post(backendUrl + '/api/doctor/login', { email, password })
         if (data.success) {
           setDToken(data.token)
@@ -39,14 +38,20 @@ const Login = () => {
         } else {
           toast.error(data.message)
         }
-
       }
     } catch (error) {
-      console.log(error)
       toast.error(error.message)
     }
-
   }
+
+  // Redirect to dashboard when token is set
+  useEffect(() => {
+    if (aToken) {
+      navigate('/admin-dashboard')
+    } else if (dToken) {
+      navigate('/doctor-dashboard')
+    }
+  }, [aToken, dToken, navigate])
 
   return (
     <form onSubmit={onSubmitHandler} className='min-h-[80vh] flex items-center'>
