@@ -1,0 +1,5 @@
+<svg width="217" height="46" viewBox="0 0 217 46" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="40" height="40" rx="10" fill="#5F6FFF" y="3"/>
+  <path d="M20 13V33M10 23H30" stroke="white" stroke-width="5" stroke-linecap="round"/>
+  <text x="55" y="33" fill="#5F6FFF" style="font-family: 'Inter', sans-serif; font-size: 32px; font-weight: 800;">UniCare</text>
+</svg>

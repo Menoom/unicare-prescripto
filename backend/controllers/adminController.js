@@ -1,0 +1,176 @@
+import jwt from "jsonwebtoken";
+import appointmentModel from "../models/appointmentModel.js";
+import doctorModel from "../models/doctorModel.js";
+import bcrypt from "bcrypt";
+import validator from "validator";
+import { v2 as cloudinary } from "cloudinary";
+import userModel from "../models/userModel.js";
+
+// API for admin login
+const loginAdmin = async (req, res) => {
+    try {
+        const { email, password } = req.body
+        if (email === process.env.ADMIN_EMAIL && password === process.env.ADMIN_PASSWORD) {
+            const token = jwt.sign(email + password, process.env.JWT_SECRET)
+            res.json({ success: true, token })
+        } else {
+            res.json({ success: false, message: "Invalid credentials" })
+        }
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to get all appointments list
+const appointmentsAdmin = async (req, res) => {
+    try {
+        const appointments = await appointmentModel.find({})
+        res.json({ success: true, appointments })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API for appointment cancellation
+const appointmentCancel = async (req, res) => {
+    try {
+        const { appointmentId } = req.body
+        await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+        res.json({ success: true, message: 'Appointment Cancelled' })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API for adding Doctor — FIXED to handle new form fields
+const addDoctor = async (req, res) => {
+    try {
+        const {
+            name, email, password,
+            speciality, degree, experience,
+            about, fees,
+            // New fields from updated form
+            dob, phone, gender, city,
+            regNumber, licenseNumber,
+            hospitalName, aadhaarNumber,
+            // Legacy field (keep for backwards compat)
+            address
+        } = req.body
+
+        // ✅ FIX: req.files instead of req.file (because we use upload.fields now)
+        const imageFile = req.files?.image?.[0]
+        const licenseFile = req.files?.licenseFile?.[0]
+
+        // Check required fields
+        if (!name || !email || !password || !speciality || !degree || !experience || !about || !fees) {
+            return res.json({ success: false, message: "Missing required details" })
+        }
+
+        // Validate email
+        if (!validator.isEmail(email)) {
+            return res.json({ success: false, message: "Please enter a valid email" })
+        }
+
+        // Validate password
+        if (password.length < 8) {
+            return res.json({ success: false, message: "Please enter a strong password (min 8 characters)" })
+        }
+
+        if (!imageFile) {
+            return res.json({ success: false, message: "Please upload a doctor photo" })
+        }
+
+        // Hash password
+        const salt = await bcrypt.genSalt(10)
+        const hashedPassword = await bcrypt.hash(password, salt)
+
+        // Upload doctor image to Cloudinary
+        const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: "image" })
+        const imageUrl = imageUpload.secure_url
+
+        // Upload license file to Cloudinary if provided
+        let licenseUrl = ''
+        if (licenseFile) {
+            const licenseUpload = await cloudinary.uploader.upload(licenseFile.path, { resource_type: "auto" })
+            licenseUrl = licenseUpload.secure_url
+        }
+
+        // Build doctor data with all new fields
+        const doctorData = {
+            name,
+            email,
+            image: imageUrl,
+            password: hashedPassword,
+            speciality,
+            degree,
+            experience,
+            about,
+            fees: Number(fees),
+            // New fields
+            dob: dob || '',
+            phone: phone || '',
+            gender: gender || 'Male',
+            city: city || '',
+            regNumber: regNumber || '',
+            licenseNumber: licenseNumber || '',
+            licenseFile: licenseUrl,
+            hospitalName: hospitalName || '',
+            aadhaarNumber: aadhaarNumber || '',
+            // Legacy address field
+            address: address ? JSON.parse(address) : { line1: city || '', line2: '' },
+            date: Date.now()
+        }
+
+        const newDoctor = new doctorModel(doctorData)
+        await newDoctor.save()
+        res.json({ success: true, message: 'Doctor Added Successfully!' })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to get all doctors list for admin panel
+const allDoctors = async (req, res) => {
+    try {
+        const doctors = await doctorModel.find({}).select('-password')
+        res.json({ success: true, doctors })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+// API to get dashboard data for admin panel
+const adminDashboard = async (req, res) => {
+    try {
+        const doctors = await doctorModel.find({})
+        const users = await userModel.find({})
+        const appointments = await appointmentModel.find({})
+
+        const dashData = {
+            doctors: doctors.length,
+            appointments: appointments.length,
+            patients: users.length,
+            latestAppointments: appointments.reverse()
+        }
+
+        res.json({ success: true, dashData })
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+export {
+    loginAdmin,
+    appointmentsAdmin,
+    appointmentCancel,
+    addDoctor,
+    allDoctors,
+    adminDashboard
+}
