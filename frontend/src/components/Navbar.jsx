@@ -15,10 +15,7 @@ const Navbar = () => {
   }
 
   return (
-    <div className='flex items-center justify-between py-4 mb-5 border-b border-b-gray-300 dark:border-b-gray-700 px-6 w-full'>
-
-  return (
-    <nav className='flex items-center justify-between py-5 border-b border-gray-100'>
+    <nav className='flex items-center justify-between py-5 border-b border-gray-100 px-6'>
       {/* Logo */}
       <div onClick={() => navigate('/')} className='flex items-center gap-2 cursor-pointer'>
         <span className='text-primary font-bold text-3xl hidden sm:block'>UniCare</span>
@@ -93,13 +90,6 @@ const Navbar = () => {
               <img src={assets.logo} className='w-8' alt="" />
               <span className='text-primary font-bold text-xl'>UniCare</span>
             </div>
-            <ul className='flex flex-col py-3'>
-              {links.map(({ to, label }) => (
-                <NavLink key={to} onClick={() => setShowMenu(false)} to={to}>
-                  <p className='px-5 py-3 text-sm text-gray-600 hover:bg-gray-50 hover:text-navy transition-colors'>{label}</p>
-                </NavLink>
-              ))}
-            </ul>
           </div>
           <ul className='flex flex-col items-center gap-2 mt-5 px-5 text-lg font-medium dark:text-white'>
             <NavLink onClick={() => setShowMenu(false)} to='/'><p className='px-4 py-2 rounded-full inline-block'>HOME</p></NavLink>

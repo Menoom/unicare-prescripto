@@ -3,7 +3,7 @@ import { assets } from '../assets/assets'
 
 const Header = () => {
     return (
-        <div className='relative w-full overflow-hidden' style={{height: '92vh'}}>
+        <div className='relative w-full overflow-hidden' style={{ height: '92vh' }}>
 
             {/* Background image */}
             <div className='absolute inset-0 w-full h-full'>
@@ -11,7 +11,7 @@ const Header = () => {
                     src={assets.header_img}
                     alt=""
                     className='w-full h-full object-cover object-top'
-                    style={{filter: 'brightness(0.45)'}}
+                    style={{ filter: 'brightness(0.45)' }}
                 />
             </div>
 
@@ -29,7 +29,7 @@ const Header = () => {
             <div className='relative z-10 flex flex-col items-start justify-center h-full px-10 md:px-20'>
 
                 {/* Badge */}
-                <div className='flex items-center gap-2 px-4 py-1.5 rounded-full mb-5' style={{background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)'}}>
+                <div className='flex items-center gap-2 px-4 py-1.5 rounded-full mb-5' style={{ background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.3)' }}>
                     <div className='w-2 h-2 bg-green-400 rounded-full'></div>
                     <span className='text-white text-xs font-medium'>100+ Trusted Doctors Available</span>
                 </div>
@@ -37,7 +37,7 @@ const Header = () => {
                 {/* Heading */}
                 <h1 className='text-4xl md:text-5xl lg:text-6xl text-white font-bold leading-tight max-w-2xl mb-4'>
                     Compassionate Care, <br />
-                    <span style={{color: '#93c5fd'}}>Exceptional Results</span>
+                    <span style={{ color: '#93c5fd' }}>Exceptional Results</span>
                 </h1>
 
                 {/* Subtext */}
@@ -64,25 +64,25 @@ const Header = () => {
                         Find Doctors
                     </a>
                 </div>
-            </div>
 
-                {/* Stats */}
-                <div className='flex gap-10 pt-5 border-t' style={{borderColor: 'rgba(255,255,255,0.2)'}}>
+                {/* Stats — moved INSIDE Content div */}
+                <div className='flex gap-10 pt-5 border-t' style={{ borderColor: 'rgba(255,255,255,0.2)' }}>
                     <div>
                         <p className='text-white font-bold text-2xl'>100+</p>
                         <p className='text-gray-300 text-sm mt-0.5'>Doctors</p>
                     </div>
-                    <div className='w-px' style={{background: 'rgba(255,255,255,0.2)'}}></div>
+                    <div className='w-px' style={{ background: 'rgba(255,255,255,0.2)' }}></div>
                     <div>
                         <p className='text-white font-bold text-2xl'>95%</p>
                         <p className='text-gray-300 text-sm mt-0.5'>Satisfaction</p>
                     </div>
-                    <div className='w-px' style={{background: 'rgba(255,255,255,0.2)'}}></div>
+                    <div className='w-px' style={{ background: 'rgba(255,255,255,0.2)' }}></div>
                     <div>
                         <p className='text-white font-bold text-2xl'>10k+</p>
                         <p className='text-gray-300 text-sm mt-0.5'>Patients</p>
                     </div>
                 </div>
+
             </div>
         </div>
     )

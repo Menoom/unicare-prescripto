@@ -1,6 +1,5 @@
 import { createContext, useEffect, useState } from "react";
 
-
 export const AppContext = createContext()
 
 const AppContextProvider = (props) => {
@@ -11,6 +10,16 @@ const AppContextProvider = (props) => {
     const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
 
     const [theme, setTheme] = useState(localStorage.getItem('theme') || 'light')
+
+    // ✅ FIX: Apply theme to <html> whenever it changes — no login dependency
+    useEffect(() => {
+        const root = window.document.documentElement;
+        if (theme === 'dark') {
+            root.classList.add('dark');
+        } else {
+            root.classList.remove('dark');
+        }
+    }, [theme]);
 
     const toggleTheme = () => {
         const newTheme = theme === 'light' ? 'dark' : 'light'
@@ -46,7 +55,6 @@ const AppContextProvider = (props) => {
             {props.children}
         </AppContext.Provider>
     )
-
 }
 
 export default AppContextProvider

@@ -2,7 +2,6 @@ import axios from "axios";
 import { createContext, useState } from "react";
 import { toast } from "react-toastify";
 
-
 export const AdminContext = createContext()
 
 const AdminContextProvider = (props) => {
@@ -15,100 +14,84 @@ const AdminContextProvider = (props) => {
     const [doctors, setDoctors] = useState([])
     const [dashData, setDashData] = useState(false)
 
+    // ✅ FIX: consistent header — backend middleware reads 'atoken' (lowercase)
+    const authHeader = () => ({ headers: { atoken: aToken } })
+
     // Getting all Doctors data from Database using API
     const getAllDoctors = async () => {
-
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/admin/all-doctors', { headers: { aToken } })
+            const { data } = await axios.get(backendUrl + '/api/admin/all-doctors', authHeader())
             if (data.success) {
                 setDoctors(data.doctors)
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
+            console.error('getAllDoctors error:', error)
             toast.error(error.message)
         }
-
     }
 
-    // Function to change doctor availablity using API
+    // Function to change doctor availability using API
     const changeAvailability = async (docId) => {
         try {
-
-            const { data } = await axios.post(backendUrl + '/api/admin/change-availability', { docId }, { headers: { aToken } })
+            const { data } = await axios.post(backendUrl + '/api/admin/change-availability', { docId }, authHeader())
             if (data.success) {
                 toast.success(data.message)
                 getAllDoctors()
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
-            console.log(error)
+            console.error('changeAvailability error:', error)
             toast.error(error.message)
         }
     }
 
-
     // Getting all appointment data from Database using API
     const getAllAppointments = async () => {
-
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/admin/appointments', { headers: { aToken } })
+            const { data } = await axios.get(backendUrl + '/api/admin/appointments', authHeader())
             if (data.success) {
                 setAppointments(data.appointments.reverse())
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
+            console.error('getAllAppointments error:', error)
             toast.error(error.message)
-            console.log(error)
         }
-
     }
 
     // Function to cancel appointment using API
     const cancelAppointment = async (appointmentId) => {
-
         try {
-
-            const { data } = await axios.post(backendUrl + '/api/admin/cancel-appointment', { appointmentId }, { headers: { aToken } })
-
+            const { data } = await axios.post(backendUrl + '/api/admin/cancel-appointment', { appointmentId }, authHeader())
             if (data.success) {
                 toast.success(data.message)
                 getAllAppointments()
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
+            console.error('cancelAppointment error:', error)
             toast.error(error.message)
-            console.log(error)
         }
-
     }
 
     // Getting Admin Dashboard data from Database using API
     const getDashData = async () => {
         try {
-
-            const { data } = await axios.get(backendUrl + '/api/admin/dashboard', { headers: { aToken } })
-
+            const { data } = await axios.get(backendUrl + '/api/admin/dashboard', authHeader())
             if (data.success) {
                 setDashData(data.dashData)
             } else {
                 toast.error(data.message)
             }
-
         } catch (error) {
-            console.log(error)
+            console.error('getDashData error:', error)
             toast.error(error.message)
         }
-
     }
 
     const value = {
@@ -128,7 +111,6 @@ const AdminContextProvider = (props) => {
             {props.children}
         </AdminContext.Provider>
     )
-
 }
 
 export default AdminContextProvider
